@@ -25,9 +25,7 @@ export class Controller{
     }
     async bootUpServer(name: string): Promise<void> {
         for (const server of this.servers) {
-            console.log(server.getName(), name)
             if (server.getName() == name) {
-                console.log("He entrado aqui")
                 await this.shell.bootUp(server); // Espera a que termine la operación
                 return; // Finaliza la función si se encuentra el servidor
             }

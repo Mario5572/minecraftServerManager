@@ -10,12 +10,13 @@ export class ShellController {
     };
     static serverUpChecker : string = 'XA1231324';
     private currentState: string; // Possible values: "ServerUp", "LoadingServer", "NoServer", "ShuttingDownServer"
-    private runningServer: MinecraftServer; //In case of the current state being ServerUp or LoadingServer, runningServer will contain the server being runned
+    private runningServer: MinecraftServer | null; //In case of the current state being ServerUp or LoadingServer, runningServer will contain the server being runned
     private shell : ChildProcessWithoutNullStreams | null = null
 
     constructor(initialState: string = ShellController.serverStates.NoServer) {
         this.currentState = initialState;
         this.shell = spawn('sh')
+        this.redirectServerOutputToCommandLine()
     }
 
     async bootUp(server: MinecraftServer) : Promise<void>{
@@ -31,7 +32,8 @@ export class ShellController {
             this.currentState = ShellController.serverStates.ServerUp
         } catch (error) {
             this.currentState = ShellController.serverStates.NoServer
-            throw new Error('Couldnt boot up the server, something went wrong')
+            this.runningServer = null;
+            throw new Error('Couldnt boot up the server, something went wrong' + error.message)
         }
         
     }
@@ -70,7 +72,7 @@ export class ShellController {
     }
     redirectServerOutputToCommandLine() : void{
 
-        if(this.currentState == ShellController.serverStates.NoServer) throw new Error("There is no server being executed cant redirect console output")
+        //if(this.currentState == ShellController.serverStates.NoServer) throw new Error("There is no server being executed cant redirect console output")
 
         this.shell?.stdout.on('data', (data) => {
             console.log(data)
