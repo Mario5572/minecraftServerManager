@@ -13,6 +13,9 @@ export class Controller{
     redirectServerOutputToCommandLine() : void{
         this.shell.redirectServerOutputToCommandLine()
     }
+    stopredirectServerOutputToCommandLine() : void{
+        this.shell.stopredirectServerOutputToCommandLine()
+    }
 
     addServer(server : MinecraftServer) : void{
         this.servers.push(server);
@@ -31,6 +34,15 @@ export class Controller{
             }
         }
         throw new Error("Couldn't find a server with that name");
+    }
+    async stopServer(name: string): Promise<void> {
+        for (const server of this.servers) {
+            if (server.getName() == name) {
+                await this.shell.stop(server);
+                return;
+            }
+        }
+        throw new Error("Server was not found")
     }
 
 }

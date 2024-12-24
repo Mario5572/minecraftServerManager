@@ -1,6 +1,11 @@
 import { spawn, ChildProcessWithoutNullStreams} from 'child_process';
 import { MinecraftServer } from './minecraftServer';
 
+const isWindows = true;
+let prefix = 'sh';
+if(isWindows){
+    prefix = 'wsl.exe';
+}
 export class ShellController {
     static serverStates = {
         ServerUp: 'ServerUp',
@@ -15,8 +20,7 @@ export class ShellController {
 
     constructor(initialState: string = ShellController.serverStates.NoServer) {
         this.currentState = initialState;
-        this.shell = spawn('sh')
-        this.redirectServerOutputToCommandLine()
+        this.shell = spawn(prefix)
     }
 
     async bootUp(server: MinecraftServer) : Promise<void>{
@@ -28,7 +32,11 @@ export class ShellController {
         this.runningServer = server
         // We wait for the server to load 
         try {
-            await this.executeAndWaitForExpectedOutput(server.getExecutablePath(),ShellController.serverUpChecker,server.getMaxTimeToBootUp())            
+            let command =  server.getExecutablePath()+'\nsay '+ShellController.serverUpChecker;
+            if(isWindows){
+                command = this.convertToWslPath(command)
+            }
+            await this.executeAndWaitForExpectedOutput(command,ShellController.serverUpChecker,server.getMaxTimeToBootUp())            
             this.currentState = ShellController.serverStates.ServerUp
         } catch (error) {
             this.currentState = ShellController.serverStates.NoServer
@@ -36,6 +44,29 @@ export class ShellController {
             throw new Error('Couldnt boot up the server, something went wrong' + error.message)
         }
         
+    }
+    async stop(server: MinecraftServer) : Promise<void>{
+        if(this.currentState == ShellController.serverStates.NoServer) throw new Error('There is no server running, cant stop')
+        if(this.currentState == ShellController.serverStates.ShuttingDownServer) throw new Error('There is a server being shut down, cant stop')
+        if(this.currentState == ShellController.serverStates.LoadingServer) throw new Error('There is a server being loaded, cant stop')
+        
+        if(this.runningServer != server){
+            throw new Error('The server will not be closed as it is not the one being run')
+        }
+        
+        this.currentState = ShellController.serverStates.ShuttingDownServer;
+        this.runningServer = null;
+        const stopVerifier = 'Exit complete'
+        let command = `stop\necho "${stopVerifier}"\n`;
+        try{
+            await this.executeAndWaitForExpectedOutput(command,stopVerifier,10)
+            this.currentState = ShellController.serverStates.NoServer;
+            return;
+        }catch(error){
+            throw new Error('The server couldnt be closed, '+ error.message)
+        }
+        
+
     }
 
     async executeAndWaitForExpectedOutput(command: string, expectedString: string, maxTime : number): Promise<void> {
@@ -49,6 +80,7 @@ export class ShellController {
                 buffer = lines.pop() || '';
                 //Im reading the buffer line by line
                 lines.forEach((line)=>{
+                    console.log("Evaluo la linea: ",line)
                     if (line.includes(expectedString)){
                         this.shell?.stdout.off('data', handleOutput); // Elimina el listener
                         resolve()
@@ -56,17 +88,14 @@ export class ShellController {
                     }
                 })
             };
-
             this.shell?.stdout.on('data', handleOutput);
 
             // Sending the command to the shell
             this.shell?.stdin.write(`${command}\n`);
-            this.shell?.stdin.write(`say ${expectedString}`)
-
             // Adding a timeout if the server doesnt start
             setTimeout(() => {
                 this.shell?.stdout.off('data', handleOutput); // Elimina el listener
-                reject(new Error('Timeout: No se recibió la salida esperada.'));
+                reject(new Error('Timeout: the expected output was not received'));
             }, maxTime*1000); // MaxTime seconds
         });
     }
@@ -74,10 +103,22 @@ export class ShellController {
 
         //if(this.currentState == ShellController.serverStates.NoServer) throw new Error("There is no server being executed cant redirect console output")
 
-        this.shell?.stdout.on('data', (data) => {
-            console.log(data)
-        });
+        this.shell?.stdout.on('data', this.outputHandler)
     }
+    stopredirectServerOutputToCommandLine() : void{
+        this.shell?.stdout.off('data', this.outputHandler)
+    }
+    convertToWslPath(windowsPath: string) : string{
+        return windowsPath
+            .replace(/\\/g, '/') // Cambiar las barras invertidas a barras normales
+            .replace(/^([a-zA-Z]):/, '/mnt/$1') // Convertir la unidad C:/ a /mnt/c
+            .toLowerCase(); // Convertir la letra de unidad a minúsculas
+    }
+    
+    outputHandler(data: Buffer) : void{
+        console.log("stdout: ",data.toString())
+    }
+
     getCurrentState() : string{
         return this.currentState
     }
