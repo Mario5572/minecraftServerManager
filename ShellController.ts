@@ -76,13 +76,11 @@ export class ShellController {
             let buffer : string = '' 
             const handleOutput = (data: Buffer) => {
                 const output = data.toString();
-                console.log(output)
                 buffer += output
                 const lines : string[] = buffer.split('\n')
                 buffer = lines.pop() || '';
                 //Im reading the buffer line by line
                 lines.forEach((line)=>{
-                    console.log("Evaluo la linea: ",line)
                     if (line.includes(expectedString)){
                         this.shell?.stdout.off('data', handleOutput); // Elimina el listener
                         resolve()
