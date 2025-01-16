@@ -17,11 +17,13 @@ export class ShellController {
     private currentState: string; // Possible values: "ServerUp", "LoadingServer", "NoServer", "ShuttingDownServer"
     private runningServer: MinecraftServer | null; //In case of the current state being ServerUp or LoadingServer, runningServer will contain the server being runned
     private shell : ChildProcessWithoutNullStreams | null = null
+    private isRedirectingToCommandLine : Boolean;
 
     constructor(initialState: string = ShellController.serverStates.NoServer) {
         this.currentState = initialState;
         this.shell = spawn(prefix)
         this.runningServer = null
+        this.isRedirectingToCommandLine = false
     }
 
     async bootUp(server: MinecraftServer) : Promise<void>{
@@ -55,7 +57,6 @@ export class ShellController {
             throw new Error('The server will not be closed as it is not the one being run')
         }
         
-        this.currentState = ShellController.serverStates.ShuttingDownServer;
         this.runningServer = null;
         const stopVerifier = 'Exit complete'
         let command = `stop\necho "${stopVerifier}"\n`;
@@ -66,8 +67,6 @@ export class ShellController {
         }catch(error : any){
             throw new Error('The server couldnt be closed, '+ error.message)
         }
-        
-
     }
 
     async executeAndWaitForExpectedOutput(command: string, expectedString: string, maxTime : number): Promise<void> {
@@ -100,12 +99,13 @@ export class ShellController {
         });
     }
     redirectServerOutputToCommandLine() : void{
-
-        //if(this.currentState == ShellController.serverStates.NoServer) throw new Error("There is no server being executed cant redirect console output")
-
+        if (this.isRedirectingToCommandLine) return;
+        this.isRedirectingToCommandLine = true;
         this.shell?.stdout.on('data', this.outputHandler)
     }
     stopredirectServerOutputToCommandLine() : void{
+        if(!this.isRedirectingToCommandLine) return;
+        this.isRedirectingToCommandLine = false;
         this.shell?.stdout.off('data', this.outputHandler)
     }
     convertToWslPath(windowsPath: string) : string{
@@ -115,7 +115,9 @@ export class ShellController {
     }
     
     outputHandler(data: Buffer) : void{
-        console.log("stdout: ",data.toString())
+        data.toString().split('\n').forEach((line) => {
+            if(line) console.log("out: ",line)
+        })
     }
 
     getCurrentState() : string{
