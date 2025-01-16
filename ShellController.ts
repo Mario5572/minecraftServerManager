@@ -21,6 +21,7 @@ export class ShellController {
     constructor(initialState: string = ShellController.serverStates.NoServer) {
         this.currentState = initialState;
         this.shell = spawn(prefix)
+        this.runningServer = null
     }
 
     async bootUp(server: MinecraftServer) : Promise<void>{
@@ -38,7 +39,7 @@ export class ShellController {
             }
             await this.executeAndWaitForExpectedOutput(command,ShellController.serverUpChecker,server.getMaxTimeToBootUp())            
             this.currentState = ShellController.serverStates.ServerUp
-        } catch (error) {
+        } catch (error : any) {
             this.currentState = ShellController.serverStates.NoServer
             this.runningServer = null;
             throw new Error('Couldnt boot up the server, something went wrong' + error.message)
@@ -62,7 +63,7 @@ export class ShellController {
             await this.executeAndWaitForExpectedOutput(command,stopVerifier,10)
             this.currentState = ShellController.serverStates.NoServer;
             return;
-        }catch(error){
+        }catch(error : any){
             throw new Error('The server couldnt be closed, '+ error.message)
         }
         
@@ -75,6 +76,7 @@ export class ShellController {
             let buffer : string = '' 
             const handleOutput = (data: Buffer) => {
                 const output = data.toString();
+                console.log(output)
                 buffer += output
                 const lines : string[] = buffer.split('\n')
                 buffer = lines.pop() || '';
@@ -112,7 +114,6 @@ export class ShellController {
         return windowsPath
             .replace(/\\/g, '/') // Cambiar las barras invertidas a barras normales
             .replace(/^([a-zA-Z]):/, '/mnt/$1') // Convertir la unidad C:/ a /mnt/c
-            .toLowerCase(); // Convertir la letra de unidad a minúsculas
     }
     
     outputHandler(data: Buffer) : void{

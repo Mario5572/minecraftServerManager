@@ -40,7 +40,7 @@ export class MinecraftServer {
             );
             
             return server
-        } catch (error) {
+        } catch (error : any) {
             throw new Error('Error while creating the server: ' + error.message);
         }
         

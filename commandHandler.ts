@@ -15,7 +15,7 @@ async function handleCommand(input : string) : Promise<void>{
             controller.addServer(server)
             console.log("Succesfully created server: ",server)
 
-        } catch (error) {
+        } catch (error : any) {
             console.log(error.message)
         }
     }
@@ -35,7 +35,7 @@ async function handleCommand(input : string) : Promise<void>{
         }
         try {
             await controller.bootUpServer(args[1]);
-        } catch (error) {
+        } catch (error : any) {
             console.log(`Couldnt boot up the server: ${error.message}`);
         }        
     }
@@ -49,8 +49,8 @@ async function handleCommand(input : string) : Promise<void>{
         }
         try {
             await controller.stopServer(args[1])
-        } catch (error) {
-            console.log("Coulnd stop the server, due to: ")
+        } catch (error : any) {
+            console.log("Couldnt stop the server, due to: "+ error.message)
         }
     }
     else if(command == 'redirect'){
@@ -64,7 +64,6 @@ async function handleCommand(input : string) : Promise<void>{
         console.log("You seem a little lost, need any \x1b[1mhelp\x1b[0m (there is a command help in case you are wondering)")
     }
 }
-
 (async () => {
     while(true){
         const input = await askQuestion(`Next Command[${controller.getCurrentState()}]:`)
