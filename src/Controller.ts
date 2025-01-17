@@ -1,5 +1,5 @@
-import { ShellController } from "./ShellController";
-import { MinecraftServer } from "./minecraftServer";
+import { ShellController } from "./ShellController.js";
+import { MinecraftServer } from "./minecraftServer.js";
 export class Controller{
     private servers : MinecraftServer[];
     private shell : ShellController;

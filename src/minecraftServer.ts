@@ -1,4 +1,4 @@
-import { askQuestion } from "./askQuestion";
+import { askQuestion } from "./askQuestion.js";
 export class MinecraftServer {
     id: number;
     private name: string;

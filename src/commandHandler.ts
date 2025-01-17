@@ -1,6 +1,6 @@
-import { askQuestion } from './askQuestion';
-import { Controller } from './Controller';
-import { MinecraftServer } from './minecraftServer';
+import { askQuestion } from './askQuestion.js';
+import { Controller } from './Controller.js';
+import { MinecraftServer } from './minecraftServer.js';
 
 const controller : Controller = new Controller();
 

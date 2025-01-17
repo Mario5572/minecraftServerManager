@@ -10,7 +10,7 @@ const rl = readline.createInterface({
 export const askQuestion = (query: string): Promise<string> => {
     return new Promise((resolve) => {
         process.stdout.write(query);
-        rl.question(query, (answer) => {
+        rl.question(query, (answer : any) => {
             resolve(answer.trim());
         });
     });

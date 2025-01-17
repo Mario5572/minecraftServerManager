@@ -1,5 +1,5 @@
 import { spawn, ChildProcessWithoutNullStreams} from 'child_process';
-import { MinecraftServer } from './minecraftServer';
+import { MinecraftServer } from './minecraftServer.js';
 
 const isWindows = true;
 let prefix = 'sh';
