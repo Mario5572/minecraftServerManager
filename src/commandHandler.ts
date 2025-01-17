@@ -2,11 +2,9 @@ import { askQuestion } from './askQuestion.js';
 import { Controller } from './Controller.js';
 import { MinecraftServer } from './minecraftServer.js';
 
-const controller : Controller = new Controller();
 
 
-
-async function handleCommand(input : string) : Promise<void>{
+async function handleCommand(input : string, controller : Controller) : Promise<void>{
     const args : string[] = input.split(' ');
     const command : string = args[0]
     if(command.toLowerCase() == 'create'){
@@ -60,9 +58,9 @@ async function handleCommand(input : string) : Promise<void>{
         console.log("You seem a little lost, need any \x1b[1mhelp\x1b[0m (there is a command help in case you are wondering)")
     }
 }
-(async () => {
+export const consoleLoop = (async (controller : Controller) => {
     while(true){
         const input = await askQuestion(`Next Command[${controller.getCurrentState()}]:`)
-        await handleCommand(input)
+        await handleCommand(input,controller)
     }
-})()
+})

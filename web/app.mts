@@ -38,10 +38,13 @@ const servers = [
   }
 ];
 
-app.get('/', (req, res) => {
-  res.render('index', { servers });
-});
-
-app.listen(3000, () => {
-  console.log('Servidor escuchando en el puerto 3000');
-});
+export async function runServer(){
+  app.get('/', (req, res) => {
+    res.render('index', { servers });
+  });
+  
+  app.listen(3000, () => {
+    console.log('Server listening on port 3000');
+  });
+  return;  
+}
