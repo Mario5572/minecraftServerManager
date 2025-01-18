@@ -17,13 +17,7 @@
       <!-- Grid para mostrar las tarjetas -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <% servers.forEach(server => { %>
-          <%- include('partials/serverCard', { 
-                imageRoute: server.image,
-                maxPlayers: server.players,
-                name: server.name,
-                description: server.description,
-                version: server.version
-            }) %>
+          <%- include('partials/serverCard', server) %>
         <% }) %>
       </div>
     </div>

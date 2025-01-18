@@ -12,12 +12,11 @@ export class MinecraftServer {
         this.executablePath = executablePath;
         this.maxPlayers = maxPlayers;
         this.version = version;
-        this.id = Math.floor(Math.random() * 10000); // Genera un ID único por defecto
+        this.id = Math.floor(Math.random() * 10000); 
         this.maxTimeToBootUp = maxTimeToBootUp;
     }
 
     static async createMinecraftServerFromUserInput(): Promise<MinecraftServer> {
-        // Configurar la interfaz para leer entrada del usuario
 
         try {
             const name = await askQuestion('Enter the server name: ');
@@ -26,7 +25,6 @@ export class MinecraftServer {
             const version = await askQuestion('Enter the server version: ');
             const maxTimeToBootUp = await askQuestion('Enter the max time to boot up (in seconds): ');
             
-            // Crear y devolver una instancia de MinecraftServer
             const badParameters = MinecraftServer.validateParameters(name,executablePath,maxPlayers,version,maxTimeToBootUp);
             if(badParameters.length > 0){
                 throw new Error("Some parameter couldnt be validated: [ " + badParameters+" ]")
@@ -45,7 +43,17 @@ export class MinecraftServer {
         }
         
     }
+    static createMinecraftServerFromJson(json : any) : MinecraftServer{
+        const maxPlayers = parseInt(json.maxPlayers, 10);
+        if (!maxPlayers || maxPlayers <= 0) {
+            throw new Error('Something went wrong parsing the json for the server: ' + json.name);
+        }
+        return new MinecraftServer(json.name,json.executablePath,maxPlayers,json.version,json.maxTimeToBootUp)
+    }
 
+    getMaxPlayers() : number{
+        return this.maxPlayers;
+    }
     getExecutablePath() : string{
         return this.executablePath;
     }
@@ -54,6 +62,9 @@ export class MinecraftServer {
     }
     getName() : string{
         return this.name
+    }
+    getVersion() : string{
+        return this.version
     }
 
     static validateParameters(

@@ -2,7 +2,7 @@
 <div class="bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
     <div class="relative h-48 overflow-hidden">
       <img 
-        src=<%= imageRoute %>
+        src=<%=  %>
         class="w-full h-full object-cover"
       />
       <div class="absolute top-0 right-0 m-4 bg-black/50 px-3 py-1 rounded-full">
@@ -14,7 +14,7 @@
       <div class="flex justify-between items-start mb-4">
         <div>
           <h3 class="text-xl font-bold text-gray-900 mb-2"><%= name %></h3>
-          <p class="text-gray-600 text-sm mb-2"><%= description %></p>
+          <p class="text-gray-600 text-sm mb-2"><%= %></p>
         </div>
         <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
           <%= version %>
@@ -22,11 +22,8 @@
       </div>
       
       <div class="flex gap-4">
-        <button class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
-          Play
-        </button>
-        <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
-          Edit
+        <button class="flex-1 <%= isRunning ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %> text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+          <%= isRunning ? 'Stop' : 'Play' %>
         </button>
       </div>
     </div>

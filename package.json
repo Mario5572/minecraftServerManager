@@ -6,7 +6,10 @@
   "main": "app.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "copy-views": "copyfiles -u 2 \"web/public/**/*\" dist/src/web/public"
+    "copy-views": "copyfiles -u 2 \"web/public/**/*\" dist/src/web/public",
+    "copy-servers" : "cp servers.json dist/src/servers.json",
+    "tw" : "npx tailwindcss -i ./web/public/input.css -o ./web/public/output.css",
+    "dev": "tsc && npm run tw && npm run copy-views && npm run copy-servers && node dist/src/src/app.js"
   },
   "author": "Pkas",
   "license": "ISC",

@@ -2,6 +2,7 @@ import express from 'express';
 const app = express();
 import { fileURLToPath } from "url"; // Importamos fileURLToPath para obtener __filename y __dirname
 import path from "path";
+import { Controller } from '../src/Controller.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -38,9 +39,10 @@ const servers = [
   }
 ];
 
-export async function runServer(){
+export async function runServer(controller : Controller){
   app.get('/', (req, res) => {
-    res.render('index', { servers });
+    console.log(controller.getServersObject())
+    res.render('index', {servers : controller.getServersObject()});
   });
   
   app.listen(3000, () => {

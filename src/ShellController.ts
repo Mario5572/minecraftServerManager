@@ -35,10 +35,11 @@ export class ShellController {
         this.runningServer = server
         // We wait for the server to load 
         try {
-            let command =  server.getExecutablePath()+'\nsay '+ShellController.serverUpChecker;
+            let path =  server.getExecutablePath();
             if(isWindows){
-                command = this.convertToWslPath(command)
+                path = this.convertToWslPath(path)
             }
+            const command = path +'\nsay '+ShellController.serverUpChecker
             await this.executeAndWaitForExpectedOutput(command,ShellController.serverUpChecker,server.getMaxTimeToBootUp())            
             this.currentState = ShellController.serverStates.ServerUp
         } catch (error : any) {
@@ -111,8 +112,8 @@ export class ShellController {
     convertToWslPath(windowsPath: string) : string{
         return windowsPath
             .replace(/\\/g, '/') // Cambiar las barras invertidas a barras normales
-            .replace(/^([a-zA-Z]):/, '/mnt/$1') // Convertir la unidad C:/ a /mnt/c
-    }
+            .replace(/^([a-zA-Z]):/, (match, drive) => `/mnt/${drive.toLowerCase()}`)
+        }
     
     outputHandler(data: Buffer) : void{
         data.toString().split('\n').forEach((line) => {
@@ -122,6 +123,9 @@ export class ShellController {
 
     getCurrentState() : string{
         return this.currentState
+    }
+    getRunningServer() : MinecraftServer | null{
+        return this.runningServer;
     }
 
     toString(): string {

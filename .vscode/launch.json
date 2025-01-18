@@ -17,7 +17,7 @@
                 "<node_internals>/**",
                 "${workspaceFolder}/node_modules/**/*.js"
             ],
-            "program": "${workspaceFolder}/dist/commandHandler.js",
+            "program": "${workspaceFolder}/dist/src/src/app.js",
             "console": "integratedTerminal",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"

@@ -54,6 +54,18 @@ async function handleCommand(input : string, controller : Controller) : Promise<
     else if(command == 'stopredirect'){
         controller.stopredirectServerOutputToCommandLine()
     }
+    else if(command == 'load'){
+        try {
+            await controller.loadServersFromJson()
+        } catch (error : any) {
+            console.log("Couldnt load the servers: "+ error)
+        }
+    }
+    else if(command == 'list'){
+        console.log("Servers:")
+        for(const server of controller.getServers())
+            console.log(server)
+    }
     else{
         console.log("You seem a little lost, need any \x1b[1mhelp\x1b[0m (there is a command help in case you are wondering)")
     }

@@ -1,5 +1,8 @@
+import { exec } from "child_process";
 import { ShellController } from "./ShellController.js";
 import { MinecraftServer } from "./minecraftServer.js";
+import { readFile } from 'fs/promises';
+
 export class Controller{
     private servers : MinecraftServer[];
     private shell : ShellController;
@@ -43,6 +46,32 @@ export class Controller{
             }
         }
         throw new Error("Server was not found")
+    }
+    async loadServersFromJson(fileToReadpath : string = './servers.json'){
+        const data = await readFile(fileToReadpath, 'utf-8');
+        const dataJson = JSON.parse(data)
+        for (const server of dataJson) {
+            try{
+                this.servers.push(MinecraftServer.createMinecraftServerFromJson(server))
+            }
+            catch(error : any){
+                console.log("Error parsing the json: ",error.message)
+            }
+        }
+    }
+    getServersObject() : Object[]{
+        const servers = []
+        for(const server of this.servers){
+            servers.push({
+                name: server.getName(),
+                maxPlayers: server.getMaxPlayers(),
+                version: server.getVersion(),
+                executablePath: server.getExecutablePath(),
+                maxTimeToBootUp: server.getMaxTimeToBootUp(),
+                isRunning : this.shell.getRunningServer() == server
+            })
+        }
+        return servers;
     }
 
 }
