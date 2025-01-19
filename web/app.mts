@@ -44,6 +44,22 @@ export async function runServer(controller : Controller){
     console.log(controller.getServersObject())
     res.render('index', {servers : controller.getServersObject()});
   });
+
+  app.get('/bootup/:name', (req, res) => {
+    
+    controller.bootUpServer(req.params.name)
+    .catch((error : any) => {
+      console.log("Error someone tried booting up the server: ",error.message)
+    });
+    res.send("Server Will boot up soon")
+  });
+  app.get('/stop/:name', (req, res) => {
+    try {
+      controller.stopServer(req.params.name)
+    } catch (error : any) {
+      console.log("Error someone tried stopping the server: ",error.message)
+    }
+  });
   
   app.listen(3000, () => {
     console.log('Server listening on port 3000');

@@ -24,3 +24,23 @@
   </div>
 </body>
 </html>
+<script>
+  // web/public/views/index.ejs
+  // ...
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach(button => {
+    button.addEventListener('click', async () => {
+      const serverName = button.id;
+      const action = button.innerText.toLowerCase() === 'play' ? 'bootup' : 'stop';
+        if(button.innerText.toLowerCase() != "loading..."){
+          const response = fetch(`/${action}/${serverName}`, {
+          method: 'GET'
+        });
+        response.then(() => {
+          window.location.reload();
+        });
+      }
+    });
+  });
+  // ...
+</script>

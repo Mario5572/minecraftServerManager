@@ -45,7 +45,7 @@ export class ShellController {
         } catch (error : any) {
             this.currentState = ShellController.serverStates.NoServer
             this.runningServer = null;
-            throw new Error('Couldnt boot up the server, something went wrong' + error.message)
+            throw new Error('Couldnt boot up the server, something went wrong, ' + error.message)
         }
         
     }
@@ -72,6 +72,12 @@ export class ShellController {
 
     async executeAndWaitForExpectedOutput(command: string, expectedString: string, maxTime : number): Promise<void> {
         return new Promise((resolve, reject) => {
+            // Adding a timeout if the server doesnt start
+            const timer = setTimeout(() => {
+                this.shell?.stdout.off('data', handleOutput); // Elimina el listener
+                this.shell?.stdin.write('stop\n'); // Stop the server in case it managed to run after the timeout
+                reject(new Error('Timeout: the expected output was not received'));
+            }, maxTime*1000); // MaxTime seconds
             // Listener temporal para capturar la salida
             let buffer : string = '' 
             const handleOutput = (data: Buffer) => {
@@ -82,7 +88,8 @@ export class ShellController {
                 //Im reading the buffer line by line
                 lines.forEach((line)=>{
                     if (line.includes(expectedString)){
-                        this.shell?.stdout.off('data', handleOutput); // Elimina el listener
+                        this.shell?.stdout.off('data', handleOutput);
+                        clearTimeout(timer); 
                         resolve()
                         return;
                     }
@@ -93,21 +100,19 @@ export class ShellController {
             // Sending the command to the shell
             this.shell?.stdin.write(`${command}\n`);
             // Adding a timeout if the server doesnt start
-            setTimeout(() => {
-                this.shell?.stdout.off('data', handleOutput); // Elimina el listener
-                reject(new Error('Timeout: the expected output was not received'));
-            }, maxTime*1000); // MaxTime seconds
         });
     }
     redirectServerOutputToCommandLine() : void{
         if (this.isRedirectingToCommandLine) return;
         this.isRedirectingToCommandLine = true;
         this.shell?.stdout.on('data', this.outputHandler)
+        this.shell?.stderr.on('data', this.outputHandler)
     }
     stopredirectServerOutputToCommandLine() : void{
         if(!this.isRedirectingToCommandLine) return;
         this.isRedirectingToCommandLine = false;
         this.shell?.stdout.off('data', this.outputHandler)
+        this.shell?.stderr.off('data', this.outputHandler)
     }
     convertToWslPath(windowsPath: string) : string{
         return windowsPath
@@ -126,6 +131,9 @@ export class ShellController {
     }
     getRunningServer() : MinecraftServer | null{
         return this.runningServer;
+    }
+    getIsRedirectingToCommandLine() : Boolean{
+        return this.isRedirectingToCommandLine
     }
 
     toString(): string {

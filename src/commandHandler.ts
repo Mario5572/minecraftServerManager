@@ -66,7 +66,14 @@ async function handleCommand(input : string, controller : Controller) : Promise<
         for(const server of controller.getServers())
             console.log(server)
     }
-    else{
+    else if(command == 'introcommand'){
+        try {
+            controller.introCommand()
+        } catch (error : any) {
+            console.log("Couldnt introduce the command: "+ error.message)
+        }
+    }
+    else if(command != ''){
         console.log("You seem a little lost, need any \x1b[1mhelp\x1b[0m (there is a command help in case you are wondering)")
     }
 }
