@@ -56,7 +56,7 @@ async function handleCommand(input : string, controller : Controller) : Promise<
     }
     else if(command == 'load'){
         try {
-            await controller.loadServersFromJson()
+            await controller.loadServersFromJson(args[1] ? args[1] : undefined)
         } catch (error : any) {
             console.log("Couldnt load the servers: "+ error)
         }
@@ -68,9 +68,16 @@ async function handleCommand(input : string, controller : Controller) : Promise<
     }
     else if(command == 'introcommand'){
         try {
-            controller.introCommand()
+            await controller.introCommand()
         } catch (error : any) {
             console.log("Couldnt introduce the command: "+ error.message)
+        }
+    }
+    else if(command == 'save'){
+        try {
+            await controller.saveServersToJson(args[1] ? args[1] : undefined)
+        } catch (error : any) {
+            console.log("Couldnt save the servers: "+ error.message)
         }
     }
     else if(command != ''){

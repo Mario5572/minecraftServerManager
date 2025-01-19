@@ -102,6 +102,9 @@ export class ShellController {
             // Adding a timeout if the server doesnt start
         });
     }
+    execute(command: string) : void{
+        this.shell?.stdin.write(`${command}\n`)
+    }
     redirectServerOutputToCommandLine() : void{
         if (this.isRedirectingToCommandLine) return;
         this.isRedirectingToCommandLine = true;

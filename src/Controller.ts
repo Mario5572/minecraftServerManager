@@ -1,7 +1,7 @@
 import { exec } from "child_process";
 import { ShellController } from "./ShellController.js";
 import { MinecraftServer } from "./minecraftServer.js";
-import { readFile } from 'fs/promises';
+import { readFile,writeFile } from 'fs/promises';
 import { askQuestion } from "./askQuestion.js";
 
 export class Controller{
@@ -59,6 +59,7 @@ export class Controller{
         this.stopredirectServerOutputToCommandLine()
         const command = await askQuestion("Enter the command to introduce: ")
         if (wasRedirecting) this.redirectServerOutputToCommandLine()
+        this.shell.execute(command)
     }
     async loadServersFromJson(fileToReadpath : string = './servers.json'){
         const data = await readFile(fileToReadpath, 'utf-8');
@@ -93,5 +94,19 @@ export class Controller{
         }
         return servers;
     }
+    async saveServersToJson(fileToWritepath : string = './servers.json'){
+        const servers = []
+        for(const server of this.servers){
+            servers.push({
+                name: server.getName(),
+                maxPlayers: server.getMaxPlayers(),
+                version: server.getVersion(),
+                executablePath: server.getExecutablePath(),
+                maxTimeToBootUp: server.getMaxTimeToBootUp(),
+            })
+        }
+        await writeFile(fileToWritepath, JSON.stringify(servers))
+    }
+
 
 }
