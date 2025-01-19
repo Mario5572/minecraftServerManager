@@ -80,6 +80,10 @@ async function handleCommand(input : string, controller : Controller) : Promise<
             console.log("Couldnt save the servers: "+ error.message)
         }
     }
+    else if(command == 'exit'){
+        console.log("Goodbye!")
+        process.exit(0)
+    }
     else if(command != ''){
         console.log("You seem a little lost, need any \x1b[1mhelp\x1b[0m (there is a command help in case you are wondering)")
     }
